@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-roteira-bg: #121212;
+  --color-roteira-card: #1E1E1E;
+  --color-roteira-border: #2C2C2C;
+  --color-roteira-neon: #F4D03F;
+  --color-roteira-text: #AFAFAF;
+}
+
+body {
+  background-color: var(--color-roteira-bg);
+  color: white;
+}
