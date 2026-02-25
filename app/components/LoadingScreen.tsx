@@ -42,7 +42,7 @@ export default function LoadingScreen({ destino = 'seu destino', perfil = 'o seu
   const currentStepIndex = steps.findLastIndex(step => progress >= step.threshold);
 
   return (
-    <div className="fixed inset-0 z-[100] bg-[#121212] flex flex-col items-center pt-24 px-6 sm:justify-center sm:pt-0 animate-fade-in">
+    <div className="fixed inset-0 z-[100] bg-[#121212] flex flex-col items-center pt-12 px-6 sm:justify-center sm:pt-0 animate-fade-in">
       
       {/* ÍCONE CENTRAL BRILHANTE */}
       <div className="relative w-40 h-40 flex items-center justify-center mb-10">
@@ -54,6 +54,20 @@ export default function LoadingScreen({ destino = 'seu destino', perfil = 'o seu
         {/* Círculo principal */}
         <div className="relative z-10 w-20 h-20 bg-roteira-neon rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(244,208,63,0.5)]">
           <Sparkles size={40} className="text-black" fill="currentColor" />
+        </div>
+      </div>
+      
+      {/* CARD DE DICA */}
+      <div className="w-full max-w-md bg-[#1C1C1C] border border-[#2C2C2C] rounded-2xl p-5 flex gap-4 sm:mt-0 mb-8 sm:mb-0">
+        <div className="shrink-0 w-10 h-10 rounded-full bg-roteira-neon/10 flex items-center justify-center">
+          <Lightbulb size={20} className="text-roteira-neon" />
+        </div>
+        <div>
+          <h5 className="text-roteira-neon text-xs font-bold tracking-widest uppercase mb-1">Dica</h5>
+          <p className="text-gray-300 text-sm leading-relaxed min-h-[40px]">
+            {/* Se a dica dinâmica ainda não chegou, mostramos o texto de loading */}
+            {dicaDinamica || "Buscando segredos locais com a IA..."}
+          </p>
         </div>
       </div>
 
@@ -103,21 +117,6 @@ export default function LoadingScreen({ destino = 'seu destino', perfil = 'o seu
           );
         })}
       </div>
-
-      {/* CARD DE DICA */}
-      <div className="w-full max-w-md bg-[#1C1C1C] border border-[#2C2C2C] rounded-2xl p-5 flex gap-4 mt-auto sm:mt-0 mb-8 sm:mb-0">
-        <div className="shrink-0 w-10 h-10 rounded-full bg-roteira-neon/10 flex items-center justify-center">
-          <Lightbulb size={20} className="text-roteira-neon" />
-        </div>
-        <div>
-          <h5 className="text-roteira-neon text-xs font-bold tracking-widest uppercase mb-1">Dica</h5>
-          <p className="text-gray-300 text-sm leading-relaxed min-h-[40px]">
-            {/* Se a dica dinâmica ainda não chegou, mostramos o texto de loading */}
-            {dicaDinamica || "Buscando segredos locais com a IA..."}
-          </p>
-        </div>
-      </div>
-
     </div>
   );
 }

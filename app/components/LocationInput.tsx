@@ -19,29 +19,53 @@ export default function LocationInput({
 }: LocationInputProps) {
   const [sugestoes, setSugestoes] = useState<any[]>([]);
   const [buscando, setBuscando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
   const [mostrarDropdown, setMostrarDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Efeito de busca na API (Debounce)
   useEffect(() => {
+    let cancelado = false;
+    const controller = new AbortController();
+
     const delayDebounceFn = setTimeout(async () => {
       if (value.length > 2 && mostrarDropdown) {
         setBuscando(true);
+        setErro(null);
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${value}&featuretype=city&limit=5&addressdetails=1`);
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(value)}&featuretype=city&limit=5&addressdetails=1`,
+            { signal: controller.signal }
+          );
+          if (!res.ok) {
+            throw new Error(`Erro HTTP ${res.status}`);
+          }
           const data = await res.json();
-          setSugestoes(data);
-        } catch (error) {
-          console.error(`Erro ao buscar ${label.toLowerCase()}:`, error);
+          if (!cancelado) {
+            setSugestoes(data);
+          }
+        } catch (error: any) {
+          if (!cancelado && error?.name !== 'AbortError') {
+            console.error(`Erro ao buscar ${label.toLowerCase()}:`, error);
+            setSugestoes([]);
+            setErro('Falha ao buscar locais. Verifique sua conexão.');
+          }
         } finally {
-          setBuscando(false);
+          if (!cancelado) {
+            setBuscando(false);
+          }
         }
       } else {
         setSugestoes([]);
+        setErro(null);
       }
     }, 500);
 
-    return () => clearTimeout(delayDebounceFn);
+    return () => {
+      cancelado = true;
+      controller.abort();
+      clearTimeout(delayDebounceFn);
+    };
   }, [value, mostrarDropdown, label]);
 
   // Fechar dropdown ao clicar fora
@@ -80,11 +104,15 @@ export default function LocationInput({
       </div>
 
       {/* Dropdown de Sugestões */}
-      {mostrarDropdown && (sugestoes.length > 0 || buscando) && (
+      {mostrarDropdown && (sugestoes.length > 0 || buscando || erro) && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-[#1C1C1C] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50">
           {buscando ? (
             <div className="p-4 text-center text-sm text-gray-400 animate-pulse">
               Buscando locais...
+            </div>
+          ) : erro ? (
+            <div className="p-4 text-center text-sm text-red-400">
+              {erro}
             </div>
           ) : (
             <ul className="max-h-60 overflow-y-auto custom-scrollbar">

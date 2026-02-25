@@ -146,10 +146,10 @@ export default function DateRangeModal({ isOpen, onClose, onConfirm, dataInicioA
                   disabled={isPassado}
                   onClick={() => selecionarData(data)}
                   className={`relative h-10 w-10 flex items-center justify-center text-sm transition-all z-10
-                    ${isPassado ? 'text-roteira-border cursor-not-allowed' : 'text-white'}
-                    ${noMeio ? 'text-roteira-neon font-bold' : ''}
-                    ${selecionado ? 'bg-roteira-neon text-black font-extrabold rounded-full shadow-[0_0_15px_var(--color-roteira-neon)]' : ''}
-                    ${!selecionado && !isPassado && !noMeio ? 'hover:bg-roteira-border rounded-full' : ''}
+                    ${selecionado ? 'bg-roteira-neon text-roteira-bg font-extrabold rounded-full shadow-[0_0_15px_var(--color-roteira-neon)]' : ''}
+                    ${!selecionado && isPassado ? 'text-roteira-border cursor-not-allowed' : ''}
+                    ${!selecionado && !isPassado && noMeio ? 'text-roteira-neon font-bold' : ''}
+                    ${!selecionado && !isPassado && !noMeio ? 'text-white hover:bg-roteira-border rounded-full' : ''}
                   `}
                 >
                   {data.getDate()}

@@ -35,7 +35,7 @@ export default function HomePage() {
     const perfis = ['Solo', 'Casal', 'Família', 'Amigos'];
 
     // Seleção múltipla de Interesses
-    const [interessesSelecionados, setInteressesSelecionados] = useState<string[]>(['']);
+    const [interessesSelecionados, setInteressesSelecionados] = useState<string[]>([]);
 
     const [dicaLoading, setDicaLoading] = useState('');
 
@@ -205,7 +205,7 @@ export default function HomePage() {
                                     className="w-full flex items-center bg-[#252525] hover:bg-[#2C2C2C] transition-colors rounded-2xl px-4 py-3.5 text-left border border-transparent focus:border-[#F4D03F]"
                                 >
                                     <Calendar size={18} className="text-gray-400 mr-3 shrink-0" />
-                                    <span className={`text-[15px] truncate ${dataInicio ? 'text-white font-bold' : 'text-gray-500'}`}>
+                                    <span className={`text-[15px] truncate ${dataInicio ? 'text-white-500' : 'text-gray-500'}`}>
                                         {formatarRangeDatas()}
                                     </span>
                                 </button>
