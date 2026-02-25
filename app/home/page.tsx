@@ -92,7 +92,7 @@ export default function HomePage() {
         setDicaLoading('');
 
         // MÁGICA 1: Dispara a busca da dica em paralelo (não usa 'await' para não travar o código!)
-        fetch('/api/gerar-dica', {
+        fetch('http://localhost:3010/api/gerar-dica', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ destino })
@@ -103,7 +103,7 @@ export default function HomePage() {
 
         // MÁGICA 2: A requisição pesada original do roteiro
         try {
-            const response = await fetch('/api/gerar-roteiro', {
+            const response = await fetch('http://localhost:3010/api/gerar-roteiro', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),

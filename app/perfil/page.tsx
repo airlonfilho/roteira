@@ -14,7 +14,7 @@ export default function PerfilrPage() {
         <div className="min-h-[100dvh] bg-roteira-bg text-white font-sans pb-24 md:pb-8 overflow-x-hidden relative">
 
             {/* HEADER FIXO (Topo) */}
-            <header className="fixed top-0 w-full z-50 px-4 py-4 flex justify-center items-center bg-roteira-bg/80 backdrop-blur-md border-b border-white/5">
+            <header className="top-0 w-full z-50 px-4 py-4 flex justify-center items-center bg-roteira-bg/80 backdrop-blur-md border-b border-white/5">
                
                 <h1 className="text-lg font-bold truncate px-4 max-w-[200px] md:max-w-md text-center">
                     Meu Perfil
