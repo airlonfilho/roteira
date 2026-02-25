@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Compass, MapPin, Sparkles, Plane, Building2,
   MessageSquare, ArrowRight, Star, ChevronDown,
@@ -13,6 +14,7 @@ import 'swiper/css/effect-coverflow';
 import 'swiper/css/pagination';
 
 export default function RoteiraLandingPage() {
+  const router = useRouter();
   const [destino, setDestino] = useState('');
   const [faqAberto, setFaqAberto] = useState<number | null>(null);
   const [sugestoes, setSugestoes] = useState<any[]>([]);
@@ -61,7 +63,7 @@ export default function RoteiraLandingPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (destino) alert(`Iniciando roteiro para: ${destino}`);
+    router.push('/home');
   };
 
   const toggleFaq = (index: number) => {
@@ -441,7 +443,7 @@ export default function RoteiraLandingPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
                   <div className="absolute bottom-8 left-6 right-6">
                     <h3 className="text-2xl font-bold text-white mb-2">{dest.title}</h3>
-                    <button className="text-roteira-neon text-sm font-bold flex items-center gap-2 group-hover:translate-x-2 transition-transform">
+                    <button onClick={() => router.push('/home')} className="text-roteira-neon text-sm font-bold flex items-center gap-2 group-hover:translate-x-2 transition-transform">
                       Gerar roteiro <ArrowRight size={16} />
                     </button>
                   </div>
