@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     ChevronLeft, Map as MapIcon, Plane, Bed,
@@ -49,9 +49,21 @@ interface RoteiroData {
 // COMPONENTE PRINCIPAL
 // ============================================================================
 export default function RoteiroPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-[100dvh] bg-roteira-bg flex flex-col items-center justify-center text-white p-6">
+                <div className="w-12 h-12 border-4 border-roteira-neon border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p className="text-roteira-text">Carregando sua aventura...</p>
+            </div>
+        }>
+            <RoteiroContent />
+        </Suspense>
+    );
+}
+
+function RoteiroContent() {
     const router = useRouter();
     const [roteiro, setRoteiro] = useState<RoteiroData | null>(null);
-
 
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
