@@ -19,7 +19,7 @@ export default function PerfilPage() {
             {/* HEADER (Oculto no Desktop conforme a regra) */}
             <Header />
 
-            <main className="flex-1 flex flex-col pt-24 pb-12 md:pt-8 px-6 max-w-6xl mx-auto w-full">
+            <main className="flex-1 flex flex-col pt-24 pb-24 md:pt-8 px-6 max-w-6xl mx-auto w-full">
                 
                 {/* GRID PRINCIPAL: 2 Colunas no Desktop */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-start">
@@ -82,6 +82,8 @@ export default function PerfilPage() {
                     </section>
                 </div>
             </main>
+
+            <BottomNav />
         </div>
     );
 }
