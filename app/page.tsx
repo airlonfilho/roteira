@@ -63,8 +63,17 @@ export default function RoteiraLandingPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    router.push('/home');
-  };
+    
+    // Evita enviar se o campo estiver vazio
+    if (!destino.trim()) return; 
+
+    // Cria os parâmetros da URL de forma segura
+    const params = new URLSearchParams();
+    params.set('destino', destino);
+
+    // Redireciona para a Home passando o destino na URL
+    router.push(`/home?${params.toString()}`);
+};
 
   const toggleFaq = (index: number) => {
     setFaqAberto(faqAberto === index ? null : index);
@@ -106,8 +115,8 @@ export default function RoteiraLandingPage() {
             <a href="#depoimentos" className="hover:text-white transition">Avaliações</a>
             <a href="#faq" className="hover:text-white transition">FAQ</a> */}
           </div>
-          <a href='/login' className="bg-roteira-card border border-roteira-border hover:border-roteira-neon text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all">
-            Login
+          <a href='/explorar' className="bg-roteira-card border border-roteira-border hover:border-roteira-neon text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all">
+            Explorar Roteiros
           </a>
         </div>
       </nav>
@@ -443,8 +452,8 @@ export default function RoteiraLandingPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
                   <div className="absolute bottom-8 left-6 right-6">
                     <h3 className="text-2xl font-bold text-white mb-2">{dest.title}</h3>
-                    <button onClick={() => router.push('/home')} className="text-roteira-neon text-sm font-bold flex items-center gap-2 group-hover:translate-x-2 transition-transform">
-                      Gerar roteiro <ArrowRight size={16} />
+                    <button onClick={() => router.push('/explorar')} className="text-roteira-neon text-sm font-bold flex items-center gap-2 group-hover:translate-x-2 transition-transform">
+                      Explorar roteiro <ArrowRight size={16} />
                     </button>
                   </div>
                 </div>
@@ -553,7 +562,7 @@ export default function RoteiraLandingPage() {
                 </li>
               </ul>
 
-              <button className="w-full bg-gradient-to-r from-roteira-neon to-[#e6c235] text-black font-bold py-5 rounded-2xl hover:scale-[1.02] transition-all shadow-[0_0_30px_rgba(244,208,63,0.3)] flex items-center justify-center gap-2 group">
+              <button onClick={() => router.push('/home')} className="w-full bg-gradient-to-r from-roteira-neon to-[#e6c235] text-black font-bold py-5 rounded-2xl hover:scale-[1.02] transition-all shadow-[0_0_30px_rgba(244,208,63,0.3)] flex items-center justify-center gap-2 group">
                 Testar Gratuitamente Agora
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>
@@ -661,7 +670,7 @@ export default function RoteiraLandingPage() {
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-                <button className="w-full sm:w-auto bg-gradient-to-r from-roteira-neon to-[#e6c235] text-black font-extrabold px-8 sm:px-10 py-4 sm:py-5 rounded-2xl text-base sm:text-lg hover:scale-105 transition-all shadow-[0_0_40px_rgba(244,208,63,0.4)] flex items-center justify-center gap-3 group">
+                <button onClick={() => router.push('/explorar')} className="w-full sm:w-auto bg-gradient-to-r from-roteira-neon to-[#e6c235] text-black font-extrabold px-8 sm:px-10 py-4 sm:py-5 rounded-2xl text-base sm:text-lg hover:scale-105 transition-all shadow-[0_0_40px_rgba(244,208,63,0.4)] flex items-center justify-center gap-3 group">
                   Criar Roteiro Agora
                   <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </button>

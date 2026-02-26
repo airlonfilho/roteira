@@ -1,148 +1,100 @@
-// components/LocationInput.tsx
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, MapPin } from 'lucide-react';
+import React, { useState } from 'react';
+import { MapPin, LocateFixed, Loader2 } from 'lucide-react';
 
 interface LocationInputProps {
   label: string;
   placeholder: string;
   value: string;
-  onChange: (val: string) => void;
+  onChange: (value: string) => void;
+  // Nova prop opcional para saber se é o campo de origem
+  isOrigin?: boolean; 
 }
 
-export default function LocationInput({ 
-  label, 
-  placeholder, 
-  value, 
-  onChange 
-}: LocationInputProps) {
-  const [sugestoes, setSugestoes] = useState<any[]>([]);
-  const [buscando, setBuscando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
-  const [mostrarDropdown, setMostrarDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+export default function LocationInput({ label, placeholder, value, onChange, isOrigin }: LocationInputProps) {
+  const [loadingLoc, setLoadingLoc] = useState(false);
 
-  // Efeito de busca na API (Debounce)
-  useEffect(() => {
-    let cancelado = false;
-    const controller = new AbortController();
+  const obterLocalizacaoAtual = () => {
+    if (!navigator.geolocation) {
+      alert("A geolocalização não é suportada pelo teu navegador.");
+      return;
+    }
 
-    const delayDebounceFn = setTimeout(async () => {
-      if (value.length > 2 && mostrarDropdown) {
-        setBuscando(true);
-        setErro(null);
+    setLoadingLoc(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        
         try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(value)}&featuretype=city&limit=5&addressdetails=1`,
-            { signal: controller.signal }
+          // Chamada à API gratuita do OpenStreetMap para Reverse Geocoding
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
           );
-          if (!res.ok) {
-            throw new Error(`Erro HTTP ${res.status}`);
+          const data = await response.json();
+          
+          // O OSM pode retornar city, town ou village dependendo do tamanho do local
+          const cidade = data.address.city || data.address.town || data.address.village || "";
+          const estado = data.address.state || "";
+          
+          if (cidade && estado) {
+            onChange(`${cidade}, ${estado}`);
+          } else {
+            onChange(data.display_name.split(',')[0]); // Fallback seguro
           }
-          const data = await res.json();
-          if (!cancelado) {
-            setSugestoes(data);
-          }
-        } catch (error: any) {
-          if (!cancelado && error?.name !== 'AbortError') {
-            console.error(`Erro ao buscar ${label.toLowerCase()}:`, error);
-            setSugestoes([]);
-            setErro('Falha ao buscar locais. Verifique sua conexão.');
-          }
+        } catch (error) {
+          console.error("Erro ao converter coordenadas:", error);
+          alert("Não foi possível descobrir o nome da tua cidade.");
         } finally {
-          if (!cancelado) {
-            setBuscando(false);
-          }
+          setLoadingLoc(false);
         }
-      } else {
-        setSugestoes([]);
-        setErro(null);
-      }
-    }, 500);
-
-    return () => {
-      cancelado = true;
-      controller.abort();
-      clearTimeout(delayDebounceFn);
-    };
-  }, [value, mostrarDropdown, label]);
-
-  // Fechar dropdown ao clicar fora
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setMostrarDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const selecionarLocal = (nomeFormatado: string) => {
-    onChange(nomeFormatado);
-    setMostrarDropdown(false);
+      },
+      (error) => {
+        console.error("Erro de geolocalização:", error);
+        alert("Por favor, permite o acesso à localização no teu navegador.");
+        setLoadingLoc(false);
+      },
+      // Opções para maior precisão
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } 
+    );
   };
 
   return (
-    <div className="mb-5 relative" ref={dropdownRef}>
-      <label className="block text-sm text-gray-400 font-medium mb-2 pl-1">{label}</label>
-      <div className="relative flex items-center bg-[#252525] rounded-2xl px-4 py-3.5 focus-within:ring-1 focus-within:ring-[#F4D03F] transition-shadow z-10">
-        <Search size={18} className="text-gray-400 mr-3 shrink-0" />
-        <input 
-          type="text" 
-          value={value}
-          onChange={(e) => {
-            onChange(e.target.value);
-            setMostrarDropdown(true);
-          }}
-          onFocus={() => setMostrarDropdown(true)}
-          placeholder={placeholder} 
-          className="bg-transparent w-full text-white placeholder:text-gray-500 outline-none text-[15px]"
-          autoComplete="off"
-        />
-      </div>
-
-      {/* Dropdown de Sugestões */}
-      {mostrarDropdown && (sugestoes.length > 0 || buscando || erro) && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-[#1C1C1C] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50">
-          {buscando ? (
-            <div className="p-4 text-center text-sm text-gray-400 animate-pulse">
-              Buscando locais...
-            </div>
-          ) : erro ? (
-            <div className="p-4 text-center text-sm text-red-400">
-              {erro}
-            </div>
-          ) : (
-            <ul className="max-h-60 overflow-y-auto custom-scrollbar">
-              {sugestoes.map((item, index) => {
-                const cidade = item.name || item.address?.city || item.address?.town || item.address?.village;
-                const estado = item.address?.state;
-                const pais = item.address?.country;
-                const nomeLimpo = [cidade, estado, pais]
-                  .filter(Boolean)
-                  .filter((v, i, a) => a.indexOf(v) === i)
-                  .join(', ');
-
-                return (
-                  <li 
-                    key={index}
-                    onMouseDown={(e) => {
-                      e.preventDefault(); 
-                      selecionarLocal(nomeLimpo);
-                    }}
-                    className="px-4 py-3 hover:bg-[#252525] cursor-pointer flex items-center gap-3 transition-colors border-b border-white/5 last:border-0"
-                  >
-                    <MapPin size={16} className="text-[#F4D03F] shrink-0" />
-                    <span className="text-sm text-white truncate">{nomeLimpo}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+    <div className="mb-4 relative">
+      <label className="block text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 ml-1">
+        {label}
+      </label>
+      <div className="relative flex items-center">
+        <div className="absolute left-4 text-gray-500">
+          <MapPin size={18} />
         </div>
-      )}
+        
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="w-full bg-[#252525] border border-transparent focus:border-[#F4D03F] text-white text-sm rounded-2xl py-3.5 pl-12 pr-12 transition-all outline-none"
+        />
+
+        {/* Botão de Localização Automática (Apenas para a Origem) */}
+        {isOrigin && (
+          <button
+            type="button"
+            onClick={obterLocalizacaoAtual}
+            disabled={loadingLoc}
+            title="Usar minha localização atual"
+            className="absolute right-3 p-1.5 text-gray-400 hover:text-[#F4D03F] bg-[#1C1C1C] rounded-xl border border-white/5 transition-colors disabled:opacity-50"
+          >
+            {loadingLoc ? (
+              <Loader2 size={16} className="animate-spin text-[#F4D03F]" />
+            ) : (
+              <LocateFixed size={16} />
+            )}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

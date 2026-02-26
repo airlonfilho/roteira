@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Bell, Search, Calendar, Wallet,
     Utensils, Landmark, TreePine, Wine,
@@ -11,7 +11,7 @@ import {
     Heart,
     MapIcon
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import LocationInput from '../components/LocationInput';
 import DateRangeModal from '../components/DateRangeModal';
 import BudgetSelect from '../components/BudgetSelect';
@@ -22,10 +22,14 @@ import Header from '../components/Header';
 
 export default function HomePage() {
     const router = useRouter();
+
+    const searchParams = useSearchParams();
+    const destinoDaURL = searchParams.get('destino');
+
     // Estados do Formulário
     const [origem, setOrigem] = useState('');
     const [destino, setDestino] = useState('');
-    const [orcamento, setOrcamento] = useState('');
+    const [orcamento, setOrcamento] = useState('Moderado');
     const [loading, setLoading] = useState(false);
 
     const [dataInicio, setDataInicio] = useState<Date | null>(null);
@@ -33,11 +37,11 @@ export default function HomePage() {
     const [modalDataAberto, setModalDataAberto] = useState(false);
 
     // Seleção única de Perfil
-    const [perfil, setPerfil] = useState('');
+    const [perfil, setPerfil] = useState('Casal');
     const perfis = ['Solo', 'Casal', 'Família', 'Amigos'];
 
     // Seleção múltipla de Interesses
-    const [interessesSelecionados, setInteressesSelecionados] = useState<string[]>([]);
+    const [interessesSelecionados, setInteressesSelecionados] = useState<string[]>(['Gastronomia', 'Cultura e História']);
 
     const [dicaLoading, setDicaLoading] = useState('');
 
@@ -59,6 +63,13 @@ export default function HomePage() {
             setInteressesSelecionados([...interessesSelecionados, id]);
         }
     };
+
+    useEffect(() => {
+        // Se a URL trouxe um destino, preenche o estado automaticamente!
+        if (destinoDaURL) {
+            setDestino(destinoDaURL);
+        }
+    }, [destinoDaURL]);
 
     const handleGerarRoteiro = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -164,9 +175,20 @@ export default function HomePage() {
 
                             {/* COLUNA ESQUERDA: LOGÍSTICA */}
                             <div className="space-y-4">
-                                <LocationInput label="Origem" placeholder="De onde você sai?" value={origem} onChange={setOrigem} />
-                                <LocationInput label="Destino" placeholder="Para onde quer ir?" value={destino} onChange={setDestino} />
+                                <LocationInput
+                                    label="Origem"
+                                    placeholder="De onde sai?"
+                                    value={origem}
+                                    onChange={setOrigem}
+                                    isOrigin={true} // <-- Ativa o botão de GPS
+                                />
 
+                                <LocationInput
+                                    label="Destino"
+                                    placeholder="Para onde quer ir?"
+                                    value={destino}
+                                    onChange={setDestino}
+                                />
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 ml-1">Quando</label>
