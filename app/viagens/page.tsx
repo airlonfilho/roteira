@@ -27,7 +27,7 @@ export default function ViagensPage() {
         
         {/* COLUNA ESQUERDA: PRÓXIMA VIAGEM (Destaque) */}
         <section className="flex-1 flex flex-col min-h-0">
-          <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-4 shrink-0">Próxima Viagem</h2>
+          <h2 className="text-3xl font-extrabold mb-6 hidden md:block">Minhas viagens</h2>
           
           {proximaViagem ? (
             <div 

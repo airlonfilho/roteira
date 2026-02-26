@@ -19,6 +19,7 @@ export default function PerfilPage() {
             {/* HEADER (Oculto no Desktop conforme a regra) */}
             <Header />
 
+            <h2 className="text-3xl font-extrabold mb-6 hidden md:block pt-8 px-6">Perfil</h2>
             <main className="flex-1 flex flex-col pt-24 pb-24 md:pt-8 px-6 max-w-6xl mx-auto w-full">
                 
                 {/* GRID PRINCIPAL: 2 Colunas no Desktop */}
@@ -31,7 +32,7 @@ export default function PerfilPage() {
                             <div className="relative">
                                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-[#F4D03F] p-1 overflow-hidden shadow-[0_0_30px_rgba(244,208,63,0.15)]">
                                     <img 
-                                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Airlon" 
+                                        src="https://avatars.githubusercontent.com/u/32520985?v=4" 
                                         alt="Airlon Filho" 
                                         className="w-full h-full rounded-full object-cover"
                                     />
