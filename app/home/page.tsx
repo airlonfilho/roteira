@@ -172,7 +172,7 @@ function HomeContent() {
                         <p className="text-gray-400 text-xs md:text-sm mt-2">Planeje sua viagem com IA em segundos.</p>
                     </div>
 
-                    <form onSubmit={handleGerarRoteiro} className="bg-[#1C1C1C] rounded-[32px] p-6 md:p-8 shadow-xl border border-white/5">
+                    <form onSubmit={handleGerarRoteiro} className="bg-[#1C1C1C] rounded-[32px] p-6 shadow-xl border border-white/5">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
                             {/* COLUNA ESQUERDA: LOGÍSTICA */}
@@ -191,14 +191,26 @@ function HomeContent() {
                                     value={destino}
                                     onChange={setDestino}
                                 />
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid gap-4">
                                     <div>
-                                        <label className="block text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 ml-1">Quando</label>
-                                        <button type="button" onClick={() => setModalDataAberto(true)} className="w-full flex items-center bg-[#252525] rounded-2xl px-4 py-3.5 border border-transparent focus:border-[#F4D03F]">
+                                        <label className="block text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 ml-1">
+                                            Quando
+                                        </label>
+                                        <button
+                                            type="button"
+                                            onClick={() => setModalDataAberto(true)}
+                                            className="w-full flex items-center bg-[#252525] rounded-2xl px-4 py-3.5 border border-transparent focus:border-[#F4D03F]"
+                                        >
                                             <Calendar size={18} className="text-gray-400 mr-2 shrink-0" />
-                                            <span className="text-sm truncate">{formatarRangeDatas()}</span>
+                                            {/* A mágica do Tailwind acontece aqui no className dinâmico */}
+                                            <span className={`text-sm truncate ${!dataInicio ? 'text-gray-500' : 'text-white'}`}>
+                                                {formatarRangeDatas()}
+                                            </span>
                                         </button>
                                     </div>
+                                </div>
+
+                                <div>
                                     <BudgetSelect value={orcamento} onChange={setOrcamento} />
                                 </div>
                             </div>

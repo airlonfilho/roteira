@@ -23,7 +23,7 @@ export default function ViagensPage() {
       {/* HEADER (Oculto no Desktop conforme padrão) */}
       <Header />
 
-      <main className="flex-1 flex pt-12 flex-col md:flex-row gap-8 p-6 pb-24 md:pt-8 max-w-7xl mx-auto w-full">
+      <main className="flex-1 flex pt-12 flex-col md:flex-row gap-8 p-6 pb-24 pt-24 md:pt-8 max-w-7xl mx-auto w-full">
         
         {/* COLUNA ESQUERDA: PRÓXIMA VIAGEM (Destaque) */}
         <section className="flex-1 flex flex-col min-h-0">
