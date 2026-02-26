@@ -101,7 +101,7 @@ export default function RoteiraLandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-roteira-bg text-white font-sans selection:bg-roteira-neon selection:text-black overflow-x-hidden">
+    <div className="min-h-screen bg-roteira-bg text-white font-sans selection:bg-roteira-neon selection:text-black overflow-x-hidden w-full max-w-[100vw] relative">
 
       {/* NAVBAR */}
       <nav className="fixed top-0 w-full z-50 bg-roteira-bg/80 backdrop-blur-md border-b border-roteira-border">
@@ -323,7 +323,7 @@ export default function RoteiraLandingPage() {
       </section>
 
       {/* 3. O PROBLEMA VS SOLUÇÃO */}
-      <section className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 text-center relative">
+      <section className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 text-center relative overflow-hidden w-full">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-roteira-neon/5 to-transparent pointer-events-none"></div>
 
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-roteira-card text-roteira-text font-medium text-sm mb-6 border border-roteira-border">
@@ -420,7 +420,7 @@ export default function RoteiraLandingPage() {
       </section>
 
       {/* 4. INSPIRAÇÃO (Carrossel Swiper) */}
-      <section className="py-16 sm:py-24 overflow-visible relative border-t border-roteira-border">
+      <section className="py-16 sm:py-24 overflow-hidden relative border-t border-roteira-border w-full">
         <div className="text-center mb-8 sm:mb-10 relative z-10 px-4">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Inspire-se.</h2>
           <p className="text-roteira-text text-base sm:text-lg max-w-2xl mx-auto">Deixe nossa IA guiar sua próxima aventura pelos destinos mais desejados do mundo.</p>
@@ -487,7 +487,7 @@ export default function RoteiraLandingPage() {
       </section>
 
       {/* 6. PREÇO TRANSPARENTE */}
-      <section className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 text-center relative">
+      <section className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 text-center relative overflow-hidden w-full">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-roteira-neon/3 to-transparent pointer-events-none"></div>
 
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-roteira-card text-roteira-neon font-medium text-sm mb-6 border border-roteira-border">
@@ -634,7 +634,7 @@ export default function RoteiraLandingPage() {
       </section>
 
       {/* 9. CTA FINAL */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 relative">
+      <section className="py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden w-full">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:32px_32px]"></div>
 
         <div className="max-w-5xl mx-auto relative">
