@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+// 1. Adicionado 'Suspense' no import do React
+import React, { useEffect, useState, Suspense } from 'react';
 import {
     Bell, Search, Calendar, Wallet,
     Utensils, Landmark, TreePine, Wine,
@@ -20,7 +21,8 @@ import BottomNav from '../components/BottomNav';
 import Header from '../components/Header';
 
 
-export default function HomePage() {
+// 2. Renomeado o antigo HomePage para HomeContent
+function HomeContent() {
     const router = useRouter();
 
     const searchParams = useSearchParams();
@@ -246,5 +248,16 @@ export default function HomePage() {
     );
 }
 
-
-
+// 3. Este é o novo componente principal que o Next.js vai enxergar
+export default function HomePage() {
+    return (
+        // O Suspense segura o carregamento da URL silenciosamente sem quebrar o build
+        <Suspense fallback={
+            <div className="min-h-screen bg-[#121212] flex items-center justify-center">
+                <div className="animate-spin w-8 h-8 border-2 border-[#F4D03F] border-t-transparent rounded-full"></div>
+            </div>
+        }>
+            <HomeContent />
+        </Suspense>
+    );
+}
