@@ -8,7 +8,8 @@ import {
     Umbrella,
     Mountain,
     ShoppingBag,
-    Heart
+    Heart,
+    MapIcon
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import LocationInput from '../components/LocationInput';
@@ -16,6 +17,7 @@ import DateRangeModal from '../components/DateRangeModal';
 import BudgetSelect from '../components/BudgetSelect';
 import LoadingScreen from '../components/LoadingScreen';
 import BottomNav from '../components/BottomNav';
+import Header from '../components/Header';
 
 
 export default function HomePage() {
@@ -142,173 +144,85 @@ export default function HomePage() {
     };
 
     return (
-        // Container principal com padding-bottom para a barra de navegação inferior não sobrepor o conteúdo
-        <div className="min-h-[100dvh] bg-[#121212] text-white font-sans pb-24 md:pb-0 overflow-x-hidden">
+        <div className="min-h-[100dvh] md:h-screen md:overflow-hidden bg-[#121212] text-white font-sans relative flex flex-col">
+            {loading && <LoadingScreen destino={destino} perfil={perfil} dicaDinamica={dicaLoading} />}
 
-            {/* SE ESTIVER CARREGANDO, MOSTRA O OVERLAY */}
-            {loading && (
-                <LoadingScreen
-                    destino={destino || 'seu destino'}
-                    perfil={perfil}
-                    dicaDinamica={dicaLoading} // <-- Passando a dica da IA para a tela
-                />
-            )}
-            <div className={`pb-24 md:pb-0 ${loading ? 'hidden' : 'block'}`}>
-                {/* HEADER (Topo) */}
-                <header className="flex justify-between items-center p-6 max-w-3xl mx-auto">
-                    {/* Ícone da Roteira com fundo estilo "Glow" */}
-                    <div className="w-12 h-12 rounded-full bg-[#F4D03F]/20 text-[#F4D03F] border border-[#F4D03F]/30 flex items-center justify-center shadow-[0_0_15px_rgba(244,208,63,0.15)]">
-                        <Compass size={24} className="text-roteira-neon sm:w-7 sm:h-7" />
+            <div className={`flex flex-col h-full ${loading ? 'hidden' : 'flex'}`}>
+                <Header />
+
+                <main className="flex-1 flex flex-col px-4 md:px-8 md:pt-8 py-24 max-w-6xl mx-auto w-full">
+                    {/* TÍTULO COMPACTO NO DESKTOP */}
+                    <div className="mb-6 md:mb-8">
+                        <h1 className="text-2xl md:text-4xl font-extrabold leading-tight tracking-tight">
+                            Descubra Sua <span className="text-[#F4D03F]">Próxima Aventura</span>
+                        </h1>
+                        <p className="text-gray-400 text-xs md:text-sm mt-2">Planeje sua viagem com IA em segundos.</p>
                     </div>
-                    {/* Sino de Notificação */}
-                    <button className="w-12 h-12 rounded-full bg-[#1C1C1C] text-gray-300 flex items-center justify-center hover:bg-[#252525] transition-colors">
-                        <Bell size={20} />
-                    </button>
-                </header>
 
-                {/* TÍTULO E SUBTÍTULO */}
-                <div className="px-6 mb-8 max-w-3xl mx-auto">
-                    <h1 className="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-3">
-                        Descubra Sua<br />Próxima Aventura
-                    </h1>
-                    <p className="text-gray-400 text-[15px] md:text-base leading-relaxed">
-                        Planeje a viagem dos seus sonhos em segundos com IA
-                    </p>
-                </div>
+                    <form onSubmit={handleGerarRoteiro} className="bg-[#1C1C1C] rounded-[32px] p-6 md:p-8 shadow-xl border border-white/5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-                {/* CARD DO FORMULÁRIO */}
-                <main className="px-4 max-w-3xl mx-auto">
-                    <form onSubmit={handleGerarRoteiro} className="bg-[#1C1C1C] rounded-[32px] p-6 shadow-xl border border-white/5">
+                            {/* COLUNA ESQUERDA: LOGÍSTICA */}
+                            <div className="space-y-4">
+                                <LocationInput label="Origem" placeholder="De onde você sai?" value={origem} onChange={setOrigem} />
+                                <LocationInput label="Destino" placeholder="Para onde quer ir?" value={destino} onChange={setDestino} />
 
-                        <LocationInput
-                            label="Origem"
-                            placeholder="De onde você sai?"
-                            value={origem}
-                            onChange={setOrigem}
-                        />
-
-                        <LocationInput
-                            label="Destino"
-                            placeholder="Para onde quer ir?"
-                            value={destino}
-                            onChange={setDestino}
-                        />
-
-                        {/* Duas Colunas: Quando / Orçamento */}
-                        <div >
-                            <div className="grid mb-6">
-                                <label className="block text-sm text-gray-400 font-medium mb-2 pl-1">Quando</label>
-                                {/* Transformamos a div em um button para abrir o modal */}
-                                <button
-                                    type="button"
-                                    onClick={() => setModalDataAberto(true)}
-                                    className="w-full flex items-center bg-[#252525] hover:bg-[#2C2C2C] transition-colors rounded-2xl px-4 py-3.5 text-left border border-transparent focus:border-[#F4D03F]"
-                                >
-                                    <Calendar size={18} className="text-gray-400 mr-3 shrink-0" />
-                                    <span className={`text-[15px] truncate ${dataInicio ? 'text-white-500' : 'text-gray-500'}`}>
-                                        {formatarRangeDatas()}
-                                    </span>
-                                </button>
-                            </div>
-                            <BudgetSelect
-                                value={orcamento}
-                                onChange={setOrcamento}
-                            />
-                        </div>
-
-                        {/* Quem vai? (Perfis) */}
-                        <div className="mb-6">
-                            <label className="block text-sm text-gray-400 font-medium mb-3 pl-1">Quem vai?</label>
-                            <div className="flex flex-wrap gap-2.5">
-                                {perfis.map((p) => (
-                                    <button
-                                        key={p}
-                                        type="button"
-                                        onClick={() => setPerfil(p)}
-                                        className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${perfil === p
-                                            ? 'bg-[#F4D03F] text-black'
-                                            : 'bg-[#252525] text-gray-300 hover:bg-[#2C2C2C]'
-                                            }`}
-                                    >
-                                        {p}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Interesses (Multi-seleção com Ícones) */}
-                        <div className="mb-8">
-                            <label className="block text-sm text-gray-400 font-medium mb-3 pl-1">Interesses</label>
-                            <div className="flex flex-wrap gap-2.5">
-                                {interesses.map(({ id, icon: Icon }) => {
-                                    const isSelected = interessesSelecionados.includes(id);
-                                    return (
-                                        <button
-                                            key={id}
-                                            type="button"
-                                            onClick={() => toggleInteresse(id)}
-                                            className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all border ${isSelected
-                                                ? 'border-[#F4D03F] text-[#F4D03F] bg-[#F4D03F]/10'
-                                                : 'border-transparent bg-[#252525] text-gray-400 hover:bg-[#2C2C2C]'
-                                                }`}
-                                        >
-                                            <Icon size={16} />
-                                            {id}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 ml-1">Quando</label>
+                                        <button type="button" onClick={() => setModalDataAberto(true)} className="w-full flex items-center bg-[#252525] rounded-2xl px-4 py-3.5 border border-transparent focus:border-[#F4D03F]">
+                                            <Calendar size={18} className="text-gray-400 mr-2 shrink-0" />
+                                            <span className="text-sm truncate">{formatarRangeDatas()}</span>
                                         </button>
-                                    );
-                                })}
+                                    </div>
+                                    <BudgetSelect value={orcamento} onChange={setOrcamento} />
+                                </div>
+                            </div>
+
+                            {/* COLUNA DIREITA: PREFERÊNCIAS */}
+                            <div className="space-y-6">
+                                <div>
+                                    <label className="block text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-3 ml-1">Quem vai?</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {perfis.map((p) => (
+                                            <button key={p} type="button" onClick={() => setPerfil(p)}
+                                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${perfil === p ? 'bg-[#F4D03F] text-black scale-105' : 'bg-[#252525] text-gray-400 hover:bg-[#2C2C2C]'}`}>
+                                                {p}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-3 ml-1">Interesses</label>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                        {interesses.map(({ id, icon: Icon }) => (
+                                            <button key={id} type="button" onClick={() => toggleInteresse(id)}
+                                                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-bold border transition-all ${interessesSelecionados.includes(id) ? 'border-[#F4D03F] text-[#F4D03F] bg-[#F4D03F]/5' : 'border-transparent bg-[#252525] text-gray-500'}`}>
+                                                <Icon size={14} /> {id}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        {/* CTA Principal */}
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className={`w-full text-black font-extrabold text-[15px] md:text-lg py-4 rounded-2xl transition-all flex items-center justify-center gap-2 mt-4
-              ${loading
-                                    ? 'bg-[#F4D03F]/70 cursor-not-allowed animate-pulse'
-                                    : 'bg-[#F4D03F] shadow-[0_0_25px_rgba(244,208,63,0.25)] hover:scale-[1.02]'
-                                }
-            `}
-                        >
-                            {loading ? (
-                                <>
-                                    {/* Um spinner simples com Tailwind */}
-                                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    Processando com IA...
-                                </>
-                            ) : (
-                                <>
-                                    <Sparkles size={20} fill="currentColor" />
-                                    Gerar Meu Roteiro Grátis
-                                </>
-                            )}
+                        {/* BOTÃO LARGO NO FINAL */}
+                        <button type="submit" disabled={loading}
+                            className={`w-full mt-8 text-black font-black text-sm md:text-base py-4 rounded-2xl transition-all flex items-center justify-center gap-2 ${loading ? 'bg-[#F4D03F]/70' : 'bg-[#F4D03F] hover:shadow-[0_0_30px_rgba(244,208,63,0.3)] hover:scale-[1.01]'}`}>
+                            <Sparkles size={20} fill="currentColor" />
+                            {loading ? 'Processando com IA...' : 'Gerar Meu Roteiro Grátis'}
                         </button>
-
                     </form>
                 </main>
 
-                {/* BOTTOM NAVIGATION (Mobile) */}
                 <BottomNav />
-
-                <DateRangeModal
-                    isOpen={modalDataAberto}
-                    onClose={() => setModalDataAberto(false)}
-                    dataInicioAtual={dataInicio}
-                    dataFimAtual={dataFim}
-                    onConfirm={(inicio, fim) => {
-                        setDataInicio(inicio);
-                        setDataFim(fim);
-                    }}
-                />
-
             </div>
+
+            <DateRangeModal isOpen={modalDataAberto} onClose={() => setModalDataAberto(false)} dataInicioAtual={dataInicio} dataFimAtual={dataFim} onConfirm={(inicio, fim) => { setDataInicio(inicio); setDataFim(fim); }} />
         </div>
     );
-
 }
+
 
 

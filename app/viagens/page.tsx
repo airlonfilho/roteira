@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Bell, Calendar, ChevronRight, Plus } from 'lucide-react';
+import { Calendar, ChevronRight, Plus, MapPin } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
+import Header from '../components/Header';
 
 export default function ViagensPage() {
   const router = useRouter();
@@ -14,71 +15,113 @@ export default function ViagensPage() {
     setListaRoteiros(salvos);
   }, []);
 
-  // O primeiro da lista é o "Em Breve" (mais recente)
   const proximaViagem = listaRoteiros[0];
-  // O restante vai para "Salvas"
   const viagensPassadas = listaRoteiros.slice(1);
 
   return (
-    <div className="min-h-[100dvh] bg-[#121212] text-white font-sans pb-28">
-      <header className="p-6 pt-12 flex justify-between items-center max-w-2xl mx-auto">
-        <h1 className="text-3xl font-extrabold tracking-tight">Meus Roteiros</h1>
-        
-      </header>
+    <div className="h-screen bg-[#121212] text-white font-sans relative flex flex-col">
+      {/* HEADER (Oculto no Desktop conforme padrão) */}
+      <Header />
 
-      <main className="px-6 max-w-2xl mx-auto space-y-8">
-        {/* SEÇÃO: PRÓXIMA VIAGEM */}
-        <section>
-          <h2 className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-4">Próxima Viagem</h2>
+      <main className="flex-1 flex pt-12 flex-col md:flex-row gap-8 p-6 pb-24 md:pt-8 max-w-7xl mx-auto w-full">
+        
+        {/* COLUNA ESQUERDA: PRÓXIMA VIAGEM (Destaque) */}
+        <section className="flex-1 flex flex-col min-h-0">
+          <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-4 shrink-0">Próxima Viagem</h2>
+          
           {proximaViagem ? (
             <div 
               onClick={() => router.push(`/roteiro?id=${proximaViagem.id}`)}
-              className="group bg-[#1C1C1C] border border-white/5 rounded-[32px] p-4 flex items-center gap-4 cursor-pointer hover:bg-[#222]"
+              className="group relative flex-1 bg-[#1C1C1C] border border-white/5 rounded-[40px] overflow-hidden cursor-pointer hover:border-[#F4D03F]/30 transition-all flex flex-col"
             >
-              <div className="w-24 h-24 shrink-0 overflow-hidden rounded-full border-2 border-[#F4D03F]/20">
-                <img src={proximaViagem.meta.image_url} className="w-full h-full object-cover" />
+              {/* Imagem de Fundo com Overlay */}
+              <div className="relative h-1/2 md:h-3/5 w-full">
+                <img 
+                  src={proximaViagem.meta.image_url} 
+                  className="w-full h-full object-cover group-hover:scale-101 transition-transform duration-700" 
+                  alt={proximaViagem.meta.destination_name}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] to-transparent"></div>
+                <div className="absolute top-6 right-6 bg-[#F4D03F] text-black text-[10px] font-black px-3 py-1 rounded-full shadow-lg">
+                  PREMIUM
+                </div>
               </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold">{proximaViagem.meta.destination_name.split(',')[0]}</h3>
-                <p className="text-gray-500 text-sm">{proximaViagem.meta.total_days} Dias • Criado em {proximaViagem.dataCriacao}</p>
-                <div className="mt-2 text-[#F4D03F] text-sm font-semibold flex items-center gap-1">
-                  <Calendar size={14} /> Ver Detalhes
+
+              {/* Informações do Roteiro */}
+              <div className="p-8 flex flex-col justify-between flex-1">
+                <div>
+                  <h3 className="text-3xl md:text-4xl font-black mb-2 tracking-tight">
+                    {proximaViagem.meta.destination_name.split(',')[0]}
+                  </h3>
+                  <div className="flex items-center gap-2 text-gray-400 text-sm">
+                    <MapPin size={16} className="text-[#F4D03F]" />
+                    <span>{proximaViagem.meta.destination_name}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between mt-6">
+                  <div className="space-y-1">
+                    <p className="text-gray-500 text-[10px] font-bold uppercase tracking-wider">Duração</p>
+                    <div className="flex items-center gap-2 font-bold">
+                       <Calendar size={18} className="text-[#F4D03F]" />
+                       <span>{proximaViagem.meta.total_days} Dias</span>
+                    </div>
+                  </div>
+                  <button className="bg-[#F4D03F] text-black px-6 py-3 rounded-2xl font-black text-sm shadow-[0_10px_20px_rgba(244,208,63,0.2)] active:scale-95 transition-all">
+                    Acessar Roteiro
+                  </button>
                 </div>
               </div>
             </div>
           ) : (
-            <button onClick={() => router.push('/home')} className="w-full border-2 border-dashed border-[#252525] rounded-[32px] p-10 flex flex-col items-center text-gray-500">
-              <Plus size={32} className="mb-2" />
-              <p>Crie seu primeiro roteiro</p>
+            /* Estado Vazio */
+            <button 
+              onClick={() => router.push('/home')} 
+              className="flex-1 border-2 border-dashed border-white/5 rounded-[40px] flex flex-col items-center justify-center gap-4 text-gray-500 hover:border-[#F4D03F]/20 hover:text-gray-400 transition-all"
+            >
+              <div className="w-16 h-16 bg-[#1C1C1C] rounded-full flex items-center justify-center border border-white/5">
+                <Plus size={32} />
+              </div>
+              <div className="text-center">
+                <p className="font-bold">Nenhum roteiro ativo</p>
+                <p className="text-xs mt-1">Sua próxima aventura começa aqui.</p>
+              </div>
             </button>
           )}
         </section>
 
-        {/* SEÇÃO: HISTÓRICO / SALVAS */}
-        {viagensPassadas.length > 0 && (
-          <section>
-            <h2 className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-4">Viagens Salvas</h2>
-            <div className="space-y-3">
-              {viagensPassadas.map((v) => (
+        {/* COLUNA DIREITA: VIAGENS SALVAS (Lista Lateral) */}
+        <section className="w-full md:w-80 lg:w-[450px] flex flex-col min-h-0">
+          <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-4 shrink-0">Histórico</h2>
+          
+          <div className="flex-1 overflow-y-auto no-scrollbar space-y-3 pb-10">
+            {viagensPassadas.length > 0 ? (
+              viagensPassadas.map((v) => (
                 <div 
                   key={v.id}
                   onClick={() => router.push(`/roteiro?id=${v.id}`)}
-                  className="bg-[#1C1C1C] border border-white/5 rounded-2xl p-3 flex items-center justify-between cursor-pointer"
+                  className="bg-[#1C1C1C] border border-white/5 rounded-[28px] p-4 flex items-center gap-4 group cursor-pointer hover:border-[#F4D03F]/30 transition-all"
                 >
-                  <div className="flex items-center gap-4">
-                    <img src={v.meta.image_url} className="w-12 h-12 rounded-xl object-cover" />
-                    <div>
-                      <h4 className="font-bold text-sm">{v.meta.destination_name.split(',')[0]}</h4>
-                      <p className="text-gray-500 text-[10px]">{v.meta.total_days} dias • {v.dataCriacao}</p>
-                    </div>
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden shrink-0 border border-white/10">
+                    <img src={v.meta.image_url} className="w-full h-full object-cover" alt={v.meta.destination_name} />
                   </div>
-                  <ChevronRight size={18} className="text-[#F4D03F]" />
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-sm truncate">{v.meta.destination_name.split(',')[0]}</h4>
+                    <p className="text-gray-500 text-[11px] mt-0.5">{v.meta.total_days} dias • {v.dataCriacao}</p>
+                  </div>
+                  <ChevronRight size={18} className="text-gray-600 group-hover:text-[#F4D03F] transition-colors" />
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+              ))
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center border border-dashed border-white/5 rounded-[28px] text-gray-600 p-8 text-center">
+                 <p className="text-xs font-medium italic">Suas viagens concluídas aparecerão aqui.</p>
+              </div>
+            )}
+          </div>
+        </section>
+
       </main>
+
       <BottomNav />
     </div>
   );

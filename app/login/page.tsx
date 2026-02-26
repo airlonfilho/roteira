@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Compass } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // --- Ícones Customizados (Para manter o padrão Premium) ---
 
@@ -16,6 +17,8 @@ const GoogleIcon = () => (
 );
 
 export default function LoginPage() {
+
+  const router = useRouter();
   return (
     <div className="h-[100dvh] bg-roteira-bg flex flex-col md:flex-row overflow-hidden font-sans">
       
@@ -79,9 +82,9 @@ export default function LoginPage() {
           </div>
 
           {/* Botão de E-mail Secundário */}
-          <a href="/home" className="w-full flex items-center justify-center bg-transparent border border-roteira-border text-white rounded-full py-4 px-6 font-bold hover:border-white transition-colors">
+          <button onClick={() => router.push('/home')} className="w-full flex items-center justify-center bg-transparent border border-roteira-border text-white rounded-full py-4 px-6 font-bold hover:border-white transition-colors">
             Entrar com E-mail
-          </a>
+          </button>
 
           {/* Footer (Termos e Privacidade) */}
           <p className="text-center text-[10px] text-[#6B6B6B] uppercase tracking-widest mt-12 leading-relaxed">

@@ -11,8 +11,7 @@ export default function BottomNav() {
   const navItems = [
     { name: 'Início', path: '/home', icon: Home },
     { name: 'Explorar', path: '/explorar', icon: Compass },
-    { name: 'Viagens', path: '/viagens', icon: Map },
-    { name: 'Perfil', path: '/perfil', icon: User },
+    { name: 'Viagens', path: '/viagens', icon: Map }
   ];
 
   return (

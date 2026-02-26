@@ -35,7 +35,7 @@ export default function DetalheLugarPage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#121212] text-white font-sans pb-32 overflow-x-hidden">
+    <div className="min-h-[100dvh] bg-[#121212] text-white font-sans pb-12 overflow-x-hidden">
       {/* 1. HERO E HEADER */}
       <div className="relative h-[450px] w-full">
         <img src={cidade.imagem} className="w-full h-full object-cover" alt={cidade.nome} />

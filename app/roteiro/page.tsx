@@ -8,6 +8,7 @@ import {
     Info
 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
+import Header from '../components/Header';
 
 // ============================================================================
 // TIPAGEM DOS DADOS (Baseado no JSON da IA)
@@ -91,41 +92,24 @@ function RoteiroContent() {
     }
 
     return (
-        <div className="min-h-[100dvh] bg-roteira-bg text-white font-sans pb-24 md:pb-8 overflow-x-hidden relative">
+        <div className="min-h-[100dvh] bg-roteira-bg text-white font-sans pb-12 md:pb-8 overflow-x-hidden relative">
 
             {/* HEADER FIXO (Topo) */}
-            <header className="fixed top-0 w-full z-50 px-4 py-4 flex justify-between items-center bg-roteira-bg/80 backdrop-blur-md border-b border-white/5">
-                <button
-                    onClick={() => router.push('/viagens')}
-                    className="w-10 h-10 bg-[#1C1C1C] rounded-full flex items-center justify-center hover:bg-[#252525] transition-colors"
-                >
-                    <ChevronLeft size={24} className="text-white" />
-                </button>
-                <h1 className="text-lg font-bold truncate px-4 max-w-[200px] md:max-w-md text-center">
-                    Roteiro de {roteiro.meta.total_days} {roteiro.meta.total_days == 1 ? "dia" : "dias"}
-                </h1>
-                <button className="w-10 h-10 bg-[#1C1C1C] rounded-full flex items-center justify-center hover:bg-[#252525] transition-colors">
-                    <MapIcon size={20} className="text-white" />
-                </button>
-            </header>
+            {/* 1. HERO E HEADER */}
+      <div className="relative h-[450px] w-full">
+        <img src={roteiro.meta.image_url} className="w-full h-full object-cover" alt={roteiro.meta.destination_name} />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-black/40"></div>
+        
+        <div className="absolute top-12 w-full px-6 flex justify-left items-center">
+          <button onClick={() => router.back()} className="w-10 h-10 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10">
+            <ChevronLeft size={24} />
+          </button>
+        </div>
 
-            {/* HERO SECTION (Imagem + Título) */}
-            <div className="relative h-64 md:h-80 w-full mt-[72px] rounded-b-[32px] overflow-hidden">
-                {/* Placeholder de Imagem Premium (Você pode trocar por imagens dinâmicas depois) */}
-                <img
-                    src={roteiro.meta.image_url}
-                    alt={`Cenário de ${roteiro.meta.destination_name}`}
-                    className="w-full h-full object-cover animate-fade-in"
-                />
-                {/* Gradiente escuro para dar leitura ao texto */}
-                <div className="absolute inset-0 bg-gradient-to-t from-roteira-bg via-roteira-bg/50 to-transparent"></div>
-
-                <div className="absolute bottom-6 left-6">
-                    <h2 className="text-3xl md:text-5xl font-extrabold text-white shadow-black/50 drop-shadow-lg">
-                        {roteiro.meta.destination_name.split(',')[0]}, {roteiro.meta.destination_name.split(',')[1]}
-                    </h2>
-                </div>
-            </div>
+        <div className="absolute bottom-8 px-6">
+          <h1 className="text-4xl font-extrabold tracking-tight">{roteiro.meta.destination_name.split(',')[0]}, {roteiro.meta.destination_name.split(',')[1]}</h1>
+        </div>
+      </div>
 
             <div className="max-w-3xl mx-auto px-4">
                 {/* SEÇÃO: SUGESTÕES DA IA */}
