@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { createClient } from '../../utils/supabase/server';
 
 // Instancia o SDK do Gemini com a sua chave (que deve estar no .env.local)
 const apiKey = process.env.GEMINI_API_KEY;
@@ -13,6 +14,9 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { origem, destino, dias, orcamento, perfil, preferencias } = body;
+
+    const supabase = await createClient();
+    const { data: { session } } = await supabase.auth.getSession();
 
     // Validação básica
     if (!destino || !dias) {
@@ -29,7 +33,7 @@ export async function POST(req: NextRequest) {
 
       REGRAS DE VOCABULÁRIO (EXTREMAMENTE RÍGIDAS - SOB PENA DE FALHA):
       1. PROIBIDO USAR (Vocabulário de robô/agência chata): Desfrute, aprecie, explore, mergulhe na cultura, inesquecível, pitoresco, deslumbrante, famoso por, não deixe de visitar, encante-se, maravilhe-se, retorne, dirija-se, majestoso. NÃO USE ESSAS PALAVRAS.
-      2. OBRIGATÓRIO USAR (Expressões naturais do Brasil): "O esquema é", "cola lá", "foge dessa furada", "a boa do dia", "surreal", "point", "vibe", "vai sem erro", "vale cada centavo", "dar um pulo", "fechar com chave de ouro", "pega essa visão".
+      2. OBRIGATÓRIO USAR (Expressões naturais do Brasil): "foge dessa furada", "a boa do dia", "surreal", "point", "vibe", "vai sem erro", "vale cada centavo", "dar um pulo", "fechar com chave de ouro".
 
       REGRAS DE CONTEÚDO (O FATOR "UAU"):
       1. TRANSPORTE (A REAL): Analise a ORIGEM e o DESTINO. No campo "best_transportation", diga exatamente qual a melhor forma de chegar (Carro, Avião, Ônibus) considerando o tempo e o orçamento. Se for perto, diga a rodovia. Se for longe, mande ir de avião.
@@ -47,18 +51,18 @@ export async function POST(req: NextRequest) {
           "destination_name": "Cidade de destino",
           "total_days": Numero,
           "budget_tier": "string",
-          "best_transportation": "String (Dá o papo reto de como chegar. Ex: 'Saindo de Iguatu pra Canoa? Pega o carro e vai pela CE-040, umas 3 horinhas e meia de viagem, super de boa.' ou 'De Fortaleza pra SP é avião direto, nem inventa.')",
-          "best_area_to_stay": "String (Dica de amigo sobre o melhor bairro para ficar, direto ao ponto)"
+          "best_transportation": "String (Fale como chegar. Ex: 'Saindo de Iguatu pra Canoa? A melhor opção é ir de carro. Vai pela CE-040, umas 3 horinhas e meia de viagem, super de boa.' ou 'De Fortaleza pra SP a melhor opção é ir de avião.')",
+          "best_area_to_stay": "String (Dica de amigo sobre o melhor bairro para ficar)"
         },
         "itinerary": [
           {
             "day_number": Numero,
-            "day_title": "String (Título chamativo e descolado pro dia)",
+            "day_title": "String (Título chamativo pro dia)",
             "day_vibe": "String (ex: 'Pé na areia e cerveja gelada')",
-            "plan_b": "String (Uma rota de fuga rápida caso chova. Sem enrolação)",
+            "plan_b": "String (Uma rota de fuga rápida caso chova.)",
             "morning": [{ 
               "title": "String", 
-              "description": "String (A dica em si, usando o tom de voz brasileiro descolado)", 
+              "description": "String (A dica em si, usando o tom de voz brasileiro)", 
               "estimated_cost": "String", 
               "insider_tip": "String",
               "preparation": "String (O que levar/vestir. Ex: 'Vai de chinelo', 'Passa repelente')",
@@ -146,7 +150,37 @@ export async function POST(req: NextRequest) {
     // Injeta a URL da imagem novinha dentro do bloco "meta" do nosso JSON
     roteiroJSON.meta.image_url = imageUrl;
 
-    // Retorna o JSON completo e rico para o frontend
+   if (session?.user) {
+        const userId = session.user.id;
+
+        const { data: perfilAtual, error: fetchError } = await supabase
+            .from('profiles')
+            .select('viagens_realizadas, roteiros_gerados, conquistas')
+            .eq('id', userId)
+            .single();
+
+        if (!fetchError && perfilAtual) {
+            let novasConquistas = [...(perfilAtual.conquistas || [])];
+
+            if (preferencias?.includes('Gastronomia') && !novasConquistas.includes('Gourmet')) {
+                novasConquistas.push('Gourmet');
+            }
+            if (perfilAtual.roteiros_gerados === 0 && !novasConquistas.includes('Explorador')) {
+                novasConquistas.push('Explorador');
+            }
+
+            await supabase
+                .from('profiles')
+                .update({
+                    viagens_realizadas: (perfilAtual.viagens_realizadas || 0) + 1,
+                    roteiros_gerados: (perfilAtual.roteiros_gerados || 0) + 1,
+                    conquistas: novasConquistas
+                })
+                .eq('id', userId);
+        }
+    }
+
+    // RETORNA A OBRA DE ARTE DO GEMINI
     return NextResponse.json(roteiroJSON);
 
   } catch (error) {

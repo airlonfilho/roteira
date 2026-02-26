@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${inter.className} bg-[#121212] text-white`}>
+      <body className={`${inter.className} bg-[#121212] text-white`} suppressHydrationWarning>
         {/* O Wrapper cuida da Sidebar e do scroll lateral */}
         <ClientLayout>
           {children}

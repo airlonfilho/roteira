@@ -19,7 +19,7 @@ import BudgetSelect from '../components/BudgetSelect';
 import LoadingScreen from '../components/LoadingScreen';
 import BottomNav from '../components/BottomNav';
 import Header from '../components/Header';
-
+import { createClient } from '../utils/supabase/client';
 
 // 2. Renomeado o antigo HomePage para HomeContent
 function HomeContent() {
@@ -67,50 +67,57 @@ function HomeContent() {
     };
 
     useEffect(() => {
-        // Se a URL trouxe um destino, preenche o estado automaticamente!
+        // 1. PRIORIDADE MÁXIMA: Se a URL trouxe um destino (veio da Landing Page)
         if (destinoDaURL) {
             setDestino(destinoDaURL);
+            return; 
+        }
+
+        // 2. A MÁGICA DA AÇÃO DIFERIDA: Verifica se o utilizador voltou do login
+        const roteiroPendenteJSON = localStorage.getItem('roteiroPendente');
+        
+        if (roteiroPendenteJSON) {
+            try {
+                // Transforma o texto guardado de volta num objeto JavaScript
+                const payloadSalvo = JSON.parse(roteiroPendenteJSON);
+                
+                // A. Restaura visualmente os campos para a tela não ficar em branco
+                if (payloadSalvo.destino) setDestino(payloadSalvo.destino);
+                if (payloadSalvo.origem) setOrigem(payloadSalvo.origem);
+                if (payloadSalvo.orcamento) setOrcamento(payloadSalvo.orcamento);
+                if (payloadSalvo.perfil) setPerfil(payloadSalvo.perfil);
+
+                // B. Limpa o "bolso" IMEDIATAMENTE. 
+                // Se não fizermos isto, ele vai gerar um roteiro novo sempre que abrir a Home!
+                localStorage.removeItem('roteiroPendente');
+
+                // C. Confirma com o Supabase que o login deu certo e dispara a IA
+                supabase.auth.getSession().then(({ data: { session } }) => {
+                    if (session) {
+                        executarIA(payloadSalvo);
+                    }
+                });
+                
+            } catch (error) {
+                console.error("Erro ao processar roteiro pendente:", error);
+                localStorage.removeItem('roteiroPendente'); // Limpa em caso de erro para não travar
+            }
         }
     }, [destinoDaURL]);
 
-    const handleGerarRoteiro = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        // 1. Validação Básica
-        if (!destino) {
-            alert("Por favor, selecione um destino para continuar.");
-            return;
-        }
-
-        // 2. Tradução de Datas para "Quantidade de Dias"
-        let diasCalculados = 3; // Default caso o usuário não preencha
-        if (dataInicio && dataFim) {
-            // Calcula a diferença em milissegundos e converte para dias
-            const diffTime = Math.abs(dataFim.getTime() - dataInicio.getTime());
-            diasCalculados = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 para incluir o dia de ida
-        } else if (dataInicio) {
-            diasCalculados = 1; // Bate e volta
-        }
-
-        // 3. Montando o Payload exato que a API espera
-        const payload = {
-            origem: origem,
-            destino: destino,
-            dias: diasCalculados,
-            orcamento: orcamento || 'Moderado', // Fallback se deixar em branco
-            perfil: perfil,
-            preferencias: interessesSelecionados.join(', ') // Ex: "Museus, Gastronomia"
-        };
-
+    const supabase = createClient();
+    
+    // NOVA FUNÇÃO: Faz apenas o trabalho pesado da IA
+    const executarIA = async (payload: any) => {
         // Inicia a tela de carregamento e reseta a dica antiga
         setLoading(true);
         setDicaLoading('');
 
-        // MÁGICA 1: Dispara a busca da dica em paralelo (não usa 'await' para não travar o código!)
+        // MÁGICA 1: Dispara a busca da dica em paralelo
         fetch('/api/gerar-dica', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ destino })
+            body: JSON.stringify({ destino: payload.destino })
         })
             .then(res => res.json())
             .then(data => setDicaLoading(data.dica))
@@ -147,6 +154,50 @@ function HomeContent() {
             alert("Ops! Houve um erro ao gerar seu roteiro. Tente novamente.");
             setLoading(false);
         }
+    };
+
+    // FUNÇÃO DO BOTÃO: Valida e decide para onde mandar o utilizador
+    const handleGerarRoteiro = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // 1. Validação básica primeiro (não faz sentido checar login se o form estiver vazio)
+        if (!destino) {
+            alert("Por favor, selecione um destino para continuar.");
+            return;
+        }
+
+        let diasCalculados = 3; // Default caso o usuário não preencha
+        if (dataInicio && dataFim) {
+            const diffTime = Math.abs(dataFim.getTime() - dataInicio.getTime());
+            diasCalculados = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        } else if (dataInicio) {
+            diasCalculados = 1;
+        }
+
+        // 2. Monta o Payload com TUDO o que o usuário escolheu
+        const payload = {
+            origem: origem,
+            destino: destino,
+            dias: diasCalculados,
+            orcamento: orcamento || 'Moderado',
+            perfil: perfil,
+            preferencias: interessesSelecionados.join(', ')
+        };
+
+        // 3. Verifica a segurança (Login)
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (!session) {
+            // Guarda o pacote completo na memória do navegador
+            localStorage.setItem('roteiroPendente', JSON.stringify(payload));
+            
+            // Redireciona para o login
+            router.push('/login');
+            return; 
+        }
+
+        // Se já estiver logado, dispara a IA direto!
+        executarIA(payload);
     };
 
     const formatarRangeDatas = () => {

@@ -45,7 +45,7 @@ export default function LoadingScreen({ destino = 'seu destino', perfil = 'o seu
     <div className="fixed inset-0 z-[100] bg-[#121212] flex flex-col items-center pt-12 px-6 sm:justify-center sm:pt-0 animate-fade-in">
       
       {/* ÍCONE CENTRAL BRILHANTE */}
-      <div className="relative w-40 h-40 flex items-center justify-center mb-10">
+      <div className="relative w-40 h-40 flex items-center justify-center">
         {/* Anéis pulsantes de fundo */}
         <div className="absolute inset-0 rounded-full border border-roteira-neon/20 animate-ping" style={{ animationDuration: '3s' }}></div>
         <div className="absolute inset-4 rounded-full border border-roteira-neon/40 animate-pulse"></div>
@@ -58,7 +58,7 @@ export default function LoadingScreen({ destino = 'seu destino', perfil = 'o seu
       </div>
       
       {/* CARD DE DICA */}
-      <div className="w-full max-w-md bg-[#1C1C1C] border border-[#2C2C2C] rounded-2xl p-5 flex gap-4 sm:mt-0 mb-8 sm:mb-0">
+      <div className="w-full max-w-md bg-[#1C1C1C] border border-[#2C2C2C] pb-8 rounded-2xl p-5 flex gap-4 sm:mt-0 sm:mb-0">
         <div className="shrink-0 w-10 h-10 rounded-full bg-roteira-neon/10 flex items-center justify-center">
           <Lightbulb size={20} className="text-roteira-neon" />
         </div>

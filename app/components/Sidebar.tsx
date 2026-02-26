@@ -43,14 +43,14 @@ export default function Sidebar() {
       </nav>
 
       {/* BANNER PREMIUM (Opcional) */}
-      <div className="mt-auto bg-gradient-to-br from-[#1C1C1C] to-black border border-white/5 rounded-3xl p-5">
+      {/* <div className="mt-auto bg-gradient-to-br from-[#1C1C1C] to-black border border-white/5 rounded-3xl p-5">
         <div className="text-[#F4D03F] mb-2"><Zap size={20} fill="currentColor" /></div>
         <p className="text-xs font-bold mb-1">Airlon, seja PRO</p>
         <p className="text-[10px] text-gray-500 leading-tight mb-3">Roteiros ilimitados e dicas secretas da IA.</p>
         <button className="w-full py-2 bg-white/5 hover:bg-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors">
           Upgrade
         </button>
-      </div>
+      </div> */}
     </aside>
   );
 }

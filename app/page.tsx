@@ -21,7 +21,11 @@ export default function RoteiraLandingPage() {
   const [buscando, setBuscando] = useState(false);
   const [mostrarDropdown, setMostrarDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   // Efeito de "Debounce" para a busca
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
@@ -63,9 +67,9 @@ export default function RoteiraLandingPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Evita enviar se o campo estiver vazio
-    if (!destino.trim()) return; 
+    if (!destino.trim()) return;
 
     // Cria os parâmetros da URL de forma segura
     const params = new URLSearchParams();
@@ -73,7 +77,7 @@ export default function RoteiraLandingPage() {
 
     // Redireciona para a Home passando o destino na URL
     router.push(`/home?${params.toString()}`);
-};
+  };
 
   const toggleFaq = (index: number) => {
     setFaqAberto(faqAberto === index ? null : index);
@@ -426,40 +430,48 @@ export default function RoteiraLandingPage() {
           <p className="text-roteira-text text-base sm:text-lg max-w-2xl mx-auto">Deixe nossa IA guiar sua próxima aventura pelos destinos mais desejados do mundo.</p>
         </div>
 
-        <div className="w-full max-w-6xl mx-auto pb-10 relative z-10">
-          <Swiper
-            effect={'coverflow'}
-            grabCursor={true}
-            centeredSlides={true}
-            slidesPerView={3}
-            loop={true}
-            loopAdditionalSlides={3}
-            speed={300}
-            autoplay={{ delay: 1000, disableOnInteraction: false }}
-            coverflowEffect={{ rotate: 0, stretch: 100, depth: 150, modifier: 1, slideShadows: true }}
-            modules={[EffectCoverflow, Autoplay, Pagination]}
-            className="swiper-inspiracao py-10"
-            breakpoints={{
-              320: { slidesPerView: 1.2 },
-              640: { slidesPerView: 2 },
-              1024: { slidesPerView: 3 },
-            }}
-          >
-            {[...destinosCarrossel, ...destinosCarrossel, ...destinosCarrossel].map((dest, idx) => (
-              <SwiperSlide key={idx}>
-                <div className="relative w-full h-[350px] sm:h-[450px] rounded-2xl sm:rounded-3xl overflow-hidden group border border-roteira-border">
-                  <img src={dest.img} alt={dest.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-                  <div className="absolute bottom-8 left-6 right-6">
-                    <h3 className="text-2xl font-bold text-white mb-2">{dest.title}</h3>
-                    <button onClick={() => router.push('/explorar')} className="text-roteira-neon text-sm font-bold flex items-center gap-2 group-hover:translate-x-2 transition-transform">
-                      Explorar roteiro <ArrowRight size={16} />
-                    </button>
+        <div className="w-full max-w-6xl mx-auto pb-10 relative z-10 min-h-[400px]">
+          {/* ---> 2. A MÁGICA ACONTECE AQUI <--- */}
+          {!isMounted ? (
+            // Placeholder enquanto o Swiper não carrega (evita que a tela pule)
+            <div className="w-full flex justify-center py-20">
+              <div className="animate-spin w-8 h-8 border-2 border-roteira-neon border-t-transparent rounded-full"></div>
+            </div>
+          ) : (
+            <Swiper
+              effect={'coverflow'}
+              grabCursor={true}
+              centeredSlides={true}
+              slidesPerView={3}
+              loop={true}
+              loopAdditionalSlides={3}
+              speed={300}
+              autoplay={{ delay: 1000, disableOnInteraction: false }}
+              coverflowEffect={{ rotate: 0, stretch: 100, depth: 150, modifier: 1, slideShadows: true }}
+              modules={[EffectCoverflow, Autoplay, Pagination]}
+              className="swiper-inspiracao py-10"
+              breakpoints={{
+                320: { slidesPerView: 1.2 },
+                640: { slidesPerView: 2 },
+                1024: { slidesPerView: 3 },
+              }}
+            >
+              {[...destinosCarrossel, ...destinosCarrossel, ...destinosCarrossel].map((dest, idx) => (
+                <SwiperSlide key={idx}>
+                  <div className="relative w-full h-[350px] sm:h-[450px] rounded-2xl sm:rounded-3xl overflow-hidden group border border-roteira-border">
+                    <img src={dest.img} alt={dest.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+                    <div className="absolute bottom-8 left-6 right-6">
+                      <h3 className="text-2xl font-bold text-white mb-2">{dest.title}</h3>
+                      <button onClick={() => router.push('/explorar')} className="text-roteira-neon text-sm font-bold flex items-center gap-2 group-hover:translate-x-2 transition-transform">
+                        Explorar roteiro <ArrowRight size={16} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
         </div>
       </section>
 
